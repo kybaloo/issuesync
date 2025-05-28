@@ -1,21 +1,26 @@
 {
   "name": "issuesync",
   "version": "1.0.0",
-  "description": "",
+  "description": "A tool for listing and synchronizing issues between GitHub repositories",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "github",
+    "issues",
+    "synchronization",
+    "cli"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
     "@octokit/rest": "^22.0.0",
-    "body-parser": "^2.2.0",
-    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
-    "express": "^5.1.0"
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
