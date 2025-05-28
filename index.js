@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 const { Octokit } = require("@octokit/rest");
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
@@ -8,17 +8,17 @@ async function listIssues(owner, repo) {
     const { data: issues } = await octokit.issues.listForRepo({ owner, repo });
 
     if (!issues.length) {
-      console.log("Aucune issue trouvée.");
+      console.log("No issues found.");
     } else {
-      console.log(`📋 Issues pour ${owner}/${repo} :`);
-      issues.forEach(issue => {
+      console.log(`📋 Issues for ${owner}/${repo}:`);
+      issues.forEach((issue) => {
         console.log(`#${issue.number} - ${issue.title}`);
       });
     }
   } catch (err) {
-    console.error("Erreur lors de la récupération des issues :", err.message);
+    console.error("Error retrieving issues:", err.message);
   }
 }
 
-// Exemple : remplace par tes propres dépôts
+// Example: replace with your own repositories
 listIssues("nodejs", "node");
