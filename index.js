@@ -10,10 +10,10 @@ async function listIssues(owner, repo) {
     if (!issues.length) {
       console.log("No issues found.");
     } else {
-      console.log(`📋 Issues for ${owner}/${repo}:`);
-      issues.forEach((issue) => {
-        console.log(`#${issue.number} - ${issue.title}`);
-      });
+        console.log(`📋 Issues for ${owner}/${repo}:`);
+        issues.forEach((issue) => {
+            console.log(`#${issue.number} - ${issue.title}`);
+        });
     }
   } catch (err) {
     console.error("Error retrieving issues:", err.message);
