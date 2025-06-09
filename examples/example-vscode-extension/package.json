@@ -1,0 +1,57 @@
+{
+  "name": "github-task-generator",
+  "displayName": "GitHub Task Generator",
+  "description": "Générer des tâches VS Code à partir d'issues GitHub",
+  "version": "0.1.0",
+  "publisher": "votre-editeur",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:github-task-generator.generateTasksFromIssues"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "github-task-generator.generateTasksFromIssues",
+        "title": "Générer des tâches à partir d'issues GitHub"
+      }
+    ],
+    "configuration": {
+      "title": "GitHub Task Generator",
+      "properties": {
+        "githubTaskGenerator.token": {
+          "type": "string",
+          "default": "",
+          "description": "Token d'accès personnel GitHub (scope: repo)"
+        },
+        "githubTaskGenerator.defaultOwner": {
+          "type": "string",
+          "default": "",
+          "description": "Propriétaire par défaut du dépôt GitHub"
+        },
+        "githubTaskGenerator.defaultRepo": {
+          "type": "string",
+          "default": "",
+          "description": "Nom par défaut du dépôt GitHub"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "echo \"Compilation would happen here\"",
+    "watch": "echo \"Watch compilation would happen here\"",
+    "test": "echo \"Error: no test specified\""
+  },
+  "dependencies": {
+    "issuesync": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.60.0"
+  }
+}
