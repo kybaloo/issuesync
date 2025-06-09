@@ -1,0 +1,43 @@
+# Fichiers de développement
+.env
+.env.*
+*.log
+
+# Fichiers et dossiers de test
+test/
+tests/
+*.test.js
+*.spec.js
+
+# Documentation de développement
+docs/
+examples/
+
+# Fichiers de configuration de développement
+.eslintrc*
+.prettierrc*
+.editorconfig
+.vscode/
+.idea/
+
+# Fichiers temporaires
+tmp/
+temp/
+
+# Ancien fichier index.js (remplacé par lib/index.js)
+index.js
+
+# Images et captures d'écran
+screenshots/
+images/
+*.png
+*.jpg
+*.gif
+
+# Scripts de développement
+scripts/
+tools/
+
+# Fichiers de sauvegarde
+*.bak
+*.backup
