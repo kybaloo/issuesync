@@ -1,24 +1,52 @@
 {
   "name": "issuesync",
   "version": "1.0.0",
-  "description": "A tool for listing and synchronizing issues between GitHub repositories",
-  "main": "index.js",
+  "description": "A library and CLI tool for listing and synchronizing issues between GitHub repositories",
+  "main": "lib/index.js",
+  "bin": {
+    "issuesync": "./cli.js"
+  },
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node cli.js",
+    "dev": "nodemon cli.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run validate",
+    "validate": "node -c lib/index.js && node -c cli.js",
+    "example:web": "node examples/web-app-integration.js",
+    "example:cli": "node examples/custom-cli.js",
+    "example:ci": "node examples/ci-cd-integration.js"
   },
   "keywords": [
     "github",
     "issues",
     "synchronization",
-    "cli"
+    "cli",
+    "library",
+    "api",
+    "github-api",
+    "issue-management",
+    "repository-sync",
+    "automation"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "kybaloo",
+  "contributors": [
+    {
+      "name": "kybaloo",
+      "email": "kybalooflo@gmail.com"
+    }
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kybaloo/issuesync.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kybaloo/issuesync/issues"
+  },
+  "homepage": "https://github.com/kybaloo/issuesync#readme",
   "type": "commonjs",
   "dependencies": {
-    "@octokit/rest": "^22.0.0",
+    "@octokit/rest": "^20.1.1",
     "dotenv": "^16.5.0",
     "yargs": "^17.7.2"
   },
