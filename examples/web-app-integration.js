@@ -1,26 +1,26 @@
-/**
- * Exemple d'intégration d'IssueSync dans une application web Express
+﻿/**
+ * Example of issuesync integration in an Express web application
  * 
- * Ce fichier montre comment IssueSync peut être utilisé dans une application web
- * pour récupérer, afficher et synchroniser des issues GitHub.
+ * This file shows how issuesync can be used in a web application
+ * to retrieve, display and synchronize GitHub issues.
  */
 
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
-const issueSync = require('issuesync'); // Notre bibliothèque
+const issuesync = require('issuesync'); // Our library
 
-// Création de l'application Express
+// Create Express application
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuration middleware
+// Middleware configuration
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 
-// Configuration session pour stocker le token GitHub
+// Session configuration to store GitHub token
 app.use(session({
   secret: 'issuesync-secret',
   resave: false,
@@ -28,14 +28,14 @@ app.use(session({
   cookie: { secure: process.env.NODE_ENV === 'production' }
 }));
 
-// Middleware pour vérifier l'authentification GitHub
+// Middleware to check GitHub authentication
 const checkGithubAuth = (req, res, next) => {
   if (!req.session.githubToken) {
     return res.redirect('/login');
   }
   
-  // Initialiser IssueSync avec le token de la session
-  issueSync.init({ token: req.session.githubToken });
+  // Initialize issuesync with session token
+  issuesync.init({ token: req.session.githubToken });
   next();
 };
 
@@ -43,7 +43,7 @@ const checkGithubAuth = (req, res, next) => {
 app.get('/', (req, res) => {
   res.render('index', { 
     authenticated: !!req.session.githubToken,
-    title: 'IssueSync Dashboard'
+    title: 'issuesync Dashboard'
   });
 });
 
@@ -56,12 +56,12 @@ app.post('/login', (req, res) => {
   
   if (!token) {
     return res.render('login', { 
-      title: 'Connexion GitHub',
-      error: 'Token GitHub requis'
+      title: 'GitHub Connexion',
+      error: 'GitHub Token required'
     });
   }
-  
-  // Stocker le token dans la session
+
+  // Store token in the session
   req.session.githubToken = token;
   res.redirect('/dashboard');
 });
@@ -71,25 +71,25 @@ app.get('/logout', (req, res) => {
   res.redirect('/');
 });
 
-// Dashboard principal
+// Main Dashboard
 app.get('/dashboard', checkGithubAuth, (req, res) => {
   res.render('dashboard', { 
-    title: 'Tableau de bord IssueSync'
+    title: 'issuesync Dashboard'
   });
 });
 
-// API pour récupérer les issues
+// API to retrieve issues
 app.get('/api/issues', checkGithubAuth, async (req, res) => {
   try {
     const { owner, repo, state, labels } = req.query;
     
     if (!owner || !repo) {
       return res.status(400).json({ 
-        error: 'Propriétaire et nom du dépôt requis'
+        error: 'owner and name of the repository required'
       });
     }
     
-    const issues = await issueSync.listIssues({
+    const issues = await issuesync.listissues({
       owner,
       repo,
       state: state || 'open',
@@ -98,12 +98,12 @@ app.get('/api/issues', checkGithubAuth, async (req, res) => {
     
     res.json(issues);
   } catch (error) {
-    console.error('Erreur lors de la récupération des issues:', error);
+    console.error('error during retrieval of the issues:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// API pour synchroniser les issues
+// API for synchronize les issues
 app.post('/api/sync', checkGithubAuth, async (req, res) => {
   try {
     const { 
@@ -114,11 +114,11 @@ app.post('/api/sync', checkGithubAuth, async (req, res) => {
     
     if (!sourceOwner || !sourceRepo || !targetOwner || !targetRepo) {
       return res.status(400).json({ 
-        error: 'Information source et cible requises'
+        error: 'Source and target information required'
       });
     }
     
-    const result = await issueSync.syncIssues({
+    const result = await issuesync.syncissues({
       sourceOwner,
       sourceRepo,
       targetOwner,
@@ -130,42 +130,42 @@ app.post('/api/sync', checkGithubAuth, async (req, res) => {
     
     res.json({
       success: true,
-      message: `${result.created.length} issues créées, ${result.skipped.length} ignorées`,
+      message: `${result.created.length} issues created, ${result.skipped.length} ignored`,
       result
     });
   } catch (error) {
-    console.error('Erreur lors de la synchronisation des issues:', error);
+    console.error('Error during synchronization of the issues:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// API pour récupérer les statistiques des issues
+// API to retrieve issue statistics
 app.get('/api/stats', checkGithubAuth, async (req, res) => {
   try {
     const { owner, repo } = req.query;
     
     if (!owner || !repo) {
       return res.status(400).json({ 
-        error: 'Propriétaire et nom du dépôt requis'
+        error: 'owner and name of the repository required'
       });
     }
     
-    // Récupérer les issues ouvertes et fermées
-    const openIssues = await issueSync.listIssues({
+    // retrieve opened and closed issues
+    const openissues = await issuesync.listissues({
       owner,
       repo,
       state: 'open'
     });
     
-    const closedIssues = await issueSync.listIssues({
+    const closedissues = await issuesync.listissues({
       owner,
       repo,
       state: 'closed'
     });
-    
-    // Analyser les labels
+
+    // Analyze the labels
     const labelCounts = {};
-    [...openIssues, ...closedIssues].forEach(issue => {
+    [...openissues, ...closedissues].forEach(issue => {
       issue.labels.forEach(label => {
         if (!labelCounts[label.name]) {
           labelCounts[label.name] = { count: 0, color: label.color };
@@ -175,35 +175,34 @@ app.get('/api/stats', checkGithubAuth, async (req, res) => {
     });
     
     res.json({
-      open: openIssues.length,
-      closed: closedIssues.length,
-      total: openIssues.length + closedIssues.length,
+      open: openissues.length,
+      closed: closedissues.length,
+      total: openissues.length + closedissues.length,
       labels: labelCounts
     });
   } catch (error) {
-    console.error('Erreur lors de la récupération des statistiques:', error);
+    console.error('Error during retrieval of the statistics:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Gestionnaire d'erreurs
+// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).render('error', { 
-    title: 'Erreur',
-    message: 'Une erreur est survenue',
+    title: 'Error',
+    message: 'An error occurred',
     error: process.env.NODE_ENV === 'development' ? err : {}
   });
 });
 
-// Démarrage du serveur
+// Start of the server
 app.listen(PORT, () => {
-  console.log(`Serveur démarré sur http://localhost:${PORT}`);
+  console.log(`Server started on http://localhost:${PORT}`);
   console.log(`Mode: ${process.env.NODE_ENV || 'development'}`);
 });
 
 /**
- * Note: Ce fichier est un exemple d'intégration et nécessiterait les vues EJS
- * correspondantes dans un dossier "views" et les fichiers statiques dans un 
- * dossier "public" pour fonctionner correctement.
+ * Note: This file is an example of integration and would require the corresponding EJS views
+ * in a "views" folder and the static files in a "public" folder to function correctly.
  */
