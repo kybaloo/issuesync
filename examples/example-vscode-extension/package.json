@@ -1,9 +1,9 @@
 {
   "name": "github-task-generator",
   "displayName": "GitHub Task Generator",
-  "description": "Générer des tâches VS Code à partir d'issues GitHub",
+  "description": "Generate VS Code tasks from GitHub issues",
   "version": "0.1.0",
-  "publisher": "votre-editeur",
+  "publisher": "your-publisher",
   "engines": {
     "vscode": "^1.60.0"
   },
@@ -18,7 +18,7 @@
     "commands": [
       {
         "command": "github-task-generator.generateTasksFromIssues",
-        "title": "Générer des tâches à partir d'issues GitHub"
+        "title": "Generate tasks from GitHub issues"
       }
     ],
     "configuration": {
@@ -27,17 +27,17 @@
         "githubTaskGenerator.token": {
           "type": "string",
           "default": "",
-          "description": "Token d'accès personnel GitHub (scope: repo)"
+          "description": "GitHub personal access token (scope: repo)"
         },
         "githubTaskGenerator.defaultOwner": {
           "type": "string",
           "default": "",
-          "description": "Propriétaire par défaut du dépôt GitHub"
+          "description": "Default GitHub repository owner"
         },
         "githubTaskGenerator.defaultRepo": {
           "type": "string",
           "default": "",
-          "description": "Nom par défaut du dépôt GitHub"
+          "description": "Default GitHub repository name"
         }
       }
     }
