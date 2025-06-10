@@ -1,89 +1,89 @@
 <!--filepath: d:\Projects\Personal\IssueSync\docs\integration-guide.md -->
-# Guide d'intégration d'IssueSync
+# IssueSync Integration Guide
 
-Ce guide explique comment intégrer la bibliothèque IssueSync dans différents types de projets. IssueSync est conçu pour être flexible et peut être intégré dans de nombreux contextes :
+This guide explains how to integrate the IssueSync library into different types of projects. IssueSync is designed to be flexible and can be integrated in numerous contexts:
 
-- Applications web (React, Vue, Angular, etc.)
-- Services backend (Express, NestJS, etc.)
-- Extensions VS Code ou autres éditeurs
-- Outils CLI personnalisés
-- Systèmes d'automatisation CI/CD
-- Applications de gestion de projet
-- Dashboards de suivi
+- Web applications (React, Vue, Angular, etc.)
+- Backend services (Express, NestJS, etc.)
+- VS Code extensions or other editors
+- Custom CLI tools
+- CI/CD automation systems
+- Project management applications
+- Tracking dashboards
 
-## Prérequis
+## Prerequisites
 
-- Node.js v14+ et npm installés
-- Un projet Node.js existant
-- Un token GitHub avec les permissions nécessaires
+- Node.js v14+ and npm installed
+- An existing Node.js project
+- A GitHub token with necessary permissions
 
 ## 1. Installation
 
-Installez IssueSync dans votre projet :
+Install IssueSync in your project:
 
 ```bash
 npm install --save issuesync
-# ou avec yarn
+# or with yarn
 yarn add issuesync
 ```
 
-## 2. Initialisation
+## 2. Initialization
 
-Initialisez IssueSync avec votre token GitHub :
+Initialize IssueSync with your GitHub token:
 
 ```javascript
 const issueSync = require('issuesync');
 
-// Option 1: Token fourni directement
-issueSync.init({ token: 'votre-token-github' });
+// Option 1: Token provided directly
+issueSync.init({ token: 'your-github-token' });
 
-// Option 2: Token depuis une variable d'environnement
-// (assurez-vous que process.env.GITHUB_TOKEN est défini)
+// Option 2: Token from environment variable
+// (make sure process.env.GITHUB_TOKEN is defined)
 issueSync.init();
 ```
 
-## 3. Utilisation de base
+## 3. Basic Usage
 
-### Lister les issues
+### List Issues
 
 ```javascript
 async function getIssues() {
   const issues = await issueSync.listIssues({
-    owner: 'propriétaire',
-    repo: 'dépôt',
+    owner: 'owner',
+    repo: 'repository',
     state: 'open',
     labels: 'bug,enhancement'
   });
   
-  console.log(`${issues.length} issues récupérées`);
+  console.log(`${issues.length} issues retrieved`);
   return issues;
 }
 ```
 
-### Synchroniser les issues
+### Synchronize Issues
 
 ```javascript
 async function syncIssues() {
   const result = await issueSync.syncIssues({
-    sourceOwner: 'source-propriétaire',
-    sourceRepo: 'source-dépôt',
-    targetOwner: 'cible-propriétaire',
-    targetRepo: 'cible-dépôt',
+    sourceOwner: 'source-owner',
+    sourceRepo: 'source-repo',
+    targetOwner: 'target-owner',
+    targetRepo: 'target-repo',
     state: 'open',
     syncComments: true
   });
   
-  console.log(`${result.created.length} issues créées, ${result.skipped.length} ignorées`);
+  console.log(`${result.created.length} issues created, ${result.skipped.length} skipped`);
   return result;
 }
 ```
 
-## 4. Scénarios d'intégration courants
+## 4. Common Integration Scenarios
 
-### Application Web
+### Web Application
 
 ```javascript
-// Exemple avec Express
+// Example with Express
 const express = require('express');
 const issueSync = require('issuesync');
 const app = express();
@@ -127,41 +127,41 @@ app.post('/api/sync', async (req, res) => {
 });
 
 app.listen(3000, () => {
-  console.log('Serveur démarré sur http://localhost:3000');
+  console.log('Server started on http://localhost:3000');
 });
 ```
 
-### Extension VS Code
+### VS Code Extension
 
 ```javascript
 const vscode = require('vscode');
 const issueSync = require('issuesync');
 
 function activate(context) {
-  // Récupérer le token depuis la configuration
-  const config = vscode.workspace.getConfiguration('monExtension');
+  // Get token from configuration
+  const config = vscode.workspace.getConfiguration('myExtension');
   const token = config.get('githubToken');
   
-  // Initialiser IssueSync
+  // Initialize IssueSync
   if (token) {
     issueSync.init({ token });
   }
   
-  // Commande pour récupérer des issues
-  let disposable = vscode.commands.registerCommand('monExtension.getIssues', async () => {
-    const owner = await vscode.window.showInputBox({ prompt: 'Propriétaire du dépôt' });
-    const repo = await vscode.window.showInputBox({ prompt: 'Nom du dépôt' });
+  // Command to retrieve issues
+  let disposable = vscode.commands.registerCommand('myExtension.getIssues', async () => {
+    const owner = await vscode.window.showInputBox({ prompt: 'Repository owner' });
+    const repo = await vscode.window.showInputBox({ prompt: 'Repository name' });
     
     if (owner && repo) {
       const issues = await issueSync.listIssues({ owner, repo });
       
-      // Afficher les issues dans une liste
+      // Display issues in a list
       const selected = await vscode.window.showQuickPick(
         issues.map(issue => ({ label: issue.title, issue }))
       );
       
       if (selected) {
-        // Utiliser l'issue sélectionnée...
+        // Use the selected issue...
       }
     }
   });
@@ -172,7 +172,7 @@ function activate(context) {
 exports.activate = activate;
 ```
 
-### Outil CLI personnalisé
+### Custom CLI Tool
 
 ```javascript
 const { Command } = require('commander');
@@ -180,17 +180,17 @@ const inquirer = require('inquirer');
 const issueSync = require('issuesync');
 const program = new Command();
 
-// Initialiser avec le token d'environnement
+// Initialize with environment token
 issueSync.init();
 
 program
   .command('issues')
-  .description('Récupérer les issues d\'un dépôt')
+  .description('Retrieve issues from a repository')
   .action(async () => {
     const answers = await inquirer.prompt([
-      { name: 'owner', message: 'Propriétaire du dépôt:' },
-      { name: 'repo', message: 'Nom du dépôt:' },
-      { name: 'state', message: 'État (open/closed/all):', default: 'open' }
+      { name: 'owner', message: 'Repository owner:' },
+      { name: 'repo', message: 'Repository name:' },
+      { name: 'state', message: 'State (open/closed/all):', default: 'open' }
     ]);
     
     const issues = await issueSync.listIssues(answers);
@@ -198,8 +198,7 @@ program
     console.table(
       issues.map(issue => ({
         '#': issue.number,
-        'Titre': issue.title,
-        'État': issue.state,
+        'Title': issue.title,        'State': issue.state,
         'Labels': issue.labels.map(l => l.name).join(', ')
       }))
     );
@@ -208,52 +207,52 @@ program
 program.parse(process.argv);
 ```
 
-### Système d'automatisation CI/CD
+### CI/CD Automation System
 
 ```javascript
-// Script d'automatisation pour synchroniser les issues après un déploiement
+// Automation script to synchronize issues after deployment
 const issueSync = require('issuesync');
 
 async function syncAfterDeploy() {
   try {
-    console.log('Synchronisation des issues après déploiement...');
+    console.log('Synchronizing issues after deployment...');
     
-    // Initialiser avec le token CI/CD
+    // Initialize with CI/CD token
     issueSync.init({ token: process.env.GH_TOKEN });
     
-    // Synchroniser les issues pertinentes
+    // Synchronize relevant issues
     const result = await issueSync.syncIssues({
-      sourceOwner: 'org-principale',
-      sourceRepo: 'repo-principal',
-      targetOwner: 'org-client',
-      targetRepo: 'repo-client',
+      sourceOwner: 'main-org',
+      sourceRepo: 'main-repo',
+      targetOwner: 'client-org',
+      targetRepo: 'client-repo',
       state: 'open',
-      labels: 'deployed', // Synchroniser uniquement les issues avec ce label
+      labels: 'deployed', // Synchronize only issues with this label
       syncComments: true
     });
     
-    console.log(`Synchronisation terminée: ${result.created.length} issues créées`);
+    console.log(`Synchronization completed: ${result.created.length} issues created`);
     return result;
   } catch (error) {
-    console.error('Erreur de synchronisation:', error);
+    console.error('Synchronization error:', error);
     process.exit(1);
   }
 }
 
-// Exécuter le script
+// Execute the script
 syncAfterDeploy();
 ```
 
-## 5. Intégration avec des systèmes de tâches
+## 5. Integration with Task Systems
 
-IssueSync peut être utilisé pour alimenter divers systèmes de gestion de tâches, comme dans cet exemple avec une extension VS Code utilisant Copilot pour générer des tâches intelligentes :
+IssueSync can be used to feed various task management systems, as in this example with a VS Code extension using Copilot to generate intelligent tasks:
 
 ```javascript
 async function generateTasksFromIssues(issues) {
   const tasks = [];
   
   for (const issue of issues) {
-    // Formater l'issue pour le système de tâches
+    // Format the issue for the task system
     const issueData = {
       id: issue.number,
       title: issue.title,
@@ -263,23 +262,23 @@ async function generateTasksFromIssues(issues) {
       assignees: issue.assignees?.map(a => a.login) || []
     };
     
-    // Vous pouvez utiliser ces données avec divers systèmes :
+    // You can use this data with various systems:
     
-    // Exemple 1: Générer une tâche avec GitHub Copilot
+    // Example 1: Generate a task with GitHub Copilot
     // const generatedTask = await copilotAPI.generateTaskFromDescription(issueData);
     
-    // Exemple 2: Créer une tâche dans un système de gestion de projet
+    // Example 2: Create a task in a project management system
     // const projectTask = await projectManagementAPI.createTask(issueData);
     
-    // Exemple 3: Créer une tâche locale dans VS Code
+    // Example 3: Create a local task in VS Code
     // await createVSCodeTask(issueData);
     
-    // Exemple 4: Générer un élément todo dans un fichier markdown
+    // Example 4: Generate a todo item in a markdown file
     // await addToMarkdownTodoList(issueData);
     
     tasks.push({
       source: issue,
-      // task: generatedTask // ou projectTask, etc.
+      // task: generatedTask // or projectTask, etc.
     });
   }
   
@@ -287,30 +286,29 @@ async function generateTasksFromIssues(issues) {
 }
 ```
 
-## 6. Bonnes pratiques
+## 6. Best Practices
 
-1. **Gestion du token** : Ne stockez jamais le token GitHub en dur dans votre code. Utilisez des variables d'environnement, des secrets sécurisés ou des configurations utilisateur.
+1. **Token Management**: Never hardcode the GitHub token in your code. Use environment variables, secure secrets, or user configurations.
 
-2. **Gestion d'erreurs** : 
+2. **Error Handling**: 
    ```javascript
    try {
      const issues = await issueSync.listIssues({ owner, repo });
    } catch (error) {
-     // Gestion des différents types d'erreurs
+     // Handle different types of errors
      if (error.message.includes('Bad credentials')) {
-       // Problème d'authentification
-     } else if (error.message.includes('Not Found')) {
-       // Dépôt non trouvé
+       // Authentication problem     } else if (error.message.includes('Not Found')) {
+       // Repository not found
      } else {
-       // Autre erreur
+       // Other error
      }
    }
    ```
 
-3. **Mise en cache** : Pour les applications à fort trafic, mettez en cache les résultats :
+3. **Caching**: For high-traffic applications, cache results:
    ```javascript
    const NodeCache = require('node-cache');
-   const cache = new NodeCache({ stdTTL: 60 }); // Expire après 60 secondes
+   const cache = new NodeCache({ stdTTL: 60 }); // Expires after 60 seconds
 
    async function getCachedIssues(owner, repo) {
      const cacheKey = `issues:${owner}:${repo}`;
@@ -325,9 +323,9 @@ async function generateTasksFromIssues(issues) {
    }
    ```
 
-4. **Utilisation optimisée** : Utilisez les filtres pour minimiser les données récupérées :
+4. **Optimized Usage**: Use filters to minimize retrieved data:
    ```javascript
-   // Récupérer uniquement ce dont vous avez besoin
+   // Retrieve only what you need
    const bugIssues = await issueSync.listIssues({
      owner,
      repo,
@@ -336,22 +334,22 @@ async function generateTasksFromIssues(issues) {
    });
    ```
 
-## 7. Exemples complets
+## 7. Complete Examples
 
-Pour des exemples complets d'intégration, consultez les fichiers suivants :
+For complete integration examples, see the following files:
 
-- [Extension VS Code avec Copilot](../examples/vscode-copilot-tasks-extension.js)
-- [Application Web Express](../examples/web-app-integration.js) (exemple hypothétique)
-- [Outil CLI personnalisé](../examples/custom-cli.js) (exemple hypothétique)
+- [VS Code Extension with Copilot](../examples/vscode-copilot-tasks-extension.js)
+- [Express Web Application](../examples/web-app-integration.js)
+- [Custom CLI Tool](../examples/custom-cli.js)
 
-## 8. Atouts d'IssueSync pour l'intégration
+## 8. IssueSync Integration Benefits
 
-1. **API simple** : Interface claire et intuitive
-2. **Flexibilité** : Utilisable dans divers contextes
-3. **Options de filtrage** : Permet de cibler exactement les issues nécessaires
-4. **Synchronisation bidirectionnelle** : Copier les issues entre dépôts
-5. **Préservation des métadonnées** : Conservation des labels, commentaires, etc.
+1. **Simple API**: Clear and intuitive interface
+2. **Flexibility**: Usable in various contexts
+3. **Filtering Options**: Allows targeting exactly the needed issues
+4. **Bidirectional Synchronization**: Copy issues between repositories
+5. **Metadata Preservation**: Retention of labels, comments, etc.
 
 ## 9. Conclusion
 
-IssueSync offre une API polyvalente pour travailler avec les issues GitHub dans n'importe quel projet Node.js. Que vous construisiez une application web, une extension, un outil CLI ou un système d'automatisation, sa conception flexible s'adapte à vos besoins.
+IssueSync offers a versatile API for working with GitHub issues in any Node.js project. Whether you're building a web application, extension, CLI tool, or automation system, its flexible design adapts to your needs.
