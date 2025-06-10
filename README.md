@@ -1,6 +1,6 @@
 # IssueSync
 
-IssueSync est une bibliothèque Node.js polyvalente pour lister et synchroniser les issues entre dépôts GitHub. Elle peut être utilisée comme un outil CLI autonome ou intégrée dans n'importe quel projet Node.js, y compris des applications web, extensions d'éditeur, systèmes d'automatisation ou autres outils personnalisés.
+IssueSync is a versatile Node.js library for listing and synchronizing issues between GitHub repositories. It can be used as a standalone CLI tool or integrated into any Node.js project, including web applications, editor extensions, automation systems, or other custom tools.
 
 ## Installation
 
@@ -96,17 +96,17 @@ Example with filters:
 node index.js sync --source-owner facebook --source-repo react --target-owner myorg --target-repo react-fork --state open --labels bug
 ```
 
-## Utilisation comme bibliothèque
+## Library Usage
 
-Vous pouvez utiliser IssueSync comme bibliothèque dans divers projets Node.js :
+You can use IssueSync as a library in various Node.js projects:
 
 ```javascript
 const issueSync = require('issuesync');
 
-// Initialisation avec un token GitHub (optionnel si variable d'env définie)
-issueSync.init({ token: 'votre_token_github' });
+// Initialize with a GitHub token (optional if environment variable is defined)
+issueSync.init({ token: 'your_github_token' });
 
-// Lister les issues d'un dépôt
+// List issues from a repository
 async function getRepoIssues() {
   const issues = await issueSync.listIssues({
     owner: 'microsoft',
@@ -118,7 +118,7 @@ async function getRepoIssues() {
   return issues;
 }
 
-// Synchroniser les issues entre dépôts
+// Synchronize issues between repositories
 async function migrateIssues() {
   const result = await issueSync.syncIssues({
     sourceOwner: 'sourceOwner',
@@ -130,34 +130,34 @@ async function migrateIssues() {
     syncComments: true
   });
   
-  console.log(`Créé ${result.created.length} issues`);
-  console.log(`Ignoré ${result.skipped.length} issues`);
+  console.log(`Created ${result.created.length} issues`);
+  console.log(`Skipped ${result.skipped.length} issues`);
 }
 ```
 
-## Scénarios d'intégration
+## Integration Scenarios
 
-IssueSync peut être intégré dans différents contextes :
+IssueSync can be integrated in different contexts:
 
-### 🌐 Applications Web
-Créez des interfaces utilisateur pour gérer et synchroniser des issues GitHub.
-[Voir l'exemple](./examples/web-app-integration.js)
+### 🌐 Web Applications
+Create user interfaces to manage and synchronize GitHub issues.
+[See example](./examples/web-app-integration.js)
 
-### 🔄 Automatisation CI/CD
-Synchronisez automatiquement les issues lors des déploiements.
-[Voir l'exemple](./examples/ci-cd-integration.js)
+### 🔄 CI/CD Automation
+Automatically synchronize issues during deployments.
+[See example](./examples/ci-cd-integration.js)
 
-### 🧰 Outils CLI personnalisés
-Créez vos propres outils CLI adaptés à vos workflows.
-[Voir l'exemple](./examples/custom-cli.js)
+### 🧰 Custom CLI Tools
+Create your own CLI tools adapted to your workflows.
+[See example](./examples/custom-cli.js)
 
-### 🧩 Extensions d'éditeur
-Intégrez les fonctionnalités d'IssueSync dans VS Code ou d'autres éditeurs.
-[Voir l'exemple](./examples/vscode-copilot-tasks-extension.js)
+### 🧩 Editor Extensions
+Integrate IssueSync features into VS Code or other editors.
+[See example](./examples/vscode-copilot-tasks-extension.js)
 
-Pour plus d'informations sur l'intégration, consultez notre [Guide d'intégration](./docs/integration-guide.md).
+For more information on integration, see our [Integration Guide](./docs/integration-guide.md).
 
-### Référence API
+### API Reference
 
 #### `init(options)`
 
@@ -194,39 +194,39 @@ Returns a Promise resolving to an object with:
 - `skipped`: Array of skipped issues (already exist)
 - `total`: Total number of source issues
 
-## Exemples de cas d'utilisation
+## Use Case Examples
 
-### 1. Synchronisation de projets client/interne
+### 1. Client/Internal Project Synchronization
 
-Synchronisez automatiquement les issues pertinentes entre votre dépôt de développement interne et le dépôt visible par le client.
+Automatically synchronize relevant issues between your internal development repository and the client-visible repository.
 
 ```javascript
-// Script de synchronisation automatique après déploiement
+// Automatic synchronization script after deployment
 const issueSync = require('issuesync');
 issueSync.init({ token: process.env.GITHUB_TOKEN });
 
 async function syncClientRepo() {
   const result = await issueSync.syncIssues({
-    sourceOwner: 'votre-entreprise',
-    sourceRepo: 'projet-interne',
-    targetOwner: 'votre-entreprise',
-    targetRepo: 'projet-client',
+    sourceOwner: 'your-company',
+    sourceRepo: 'internal-project',
+    targetOwner: 'your-company',
+    targetRepo: 'client-project',
     state: 'open',
     labels: 'client-visible,deployed'
   });
   
-  console.log(`${result.created.length} issues synchronisées avec le repo client`);
+  console.log(`${result.created.length} issues synchronized with client repo`);
 }
 
 syncClientRepo();
 ```
 
-### 2. Dashboard de gestion d'issues
+### 2. Issue Management Dashboard
 
-Créez un dashboard personnalisé pour suivre et gérer les issues à travers plusieurs dépôts.
+Create a custom dashboard to track and manage issues across multiple repositories.
 
 ```javascript
-// Exemple Express simplifié
+// Simplified Express example
 const express = require('express');
 const issueSync = require('issuesync');
 const app = express();
@@ -235,8 +235,8 @@ issueSync.init({ token: process.env.GITHUB_TOKEN });
 
 app.get('/dashboard', async (req, res) => {
   const repos = [
-    { owner: 'votre-org', repo: 'projet-1' },
-    { owner: 'votre-org', repo: 'projet-2' }
+    { owner: 'your-org', repo: 'project-1' },
+    { owner: 'your-org', repo: 'project-2' }
   ];
   
   const allIssues = [];
@@ -258,29 +258,28 @@ app.get('/dashboard', async (req, res) => {
 });
 ```
 
-### 3. Intégration avec les outils de gestion de tâches
+### 3. Integration with Task Management Tools
 
-Utilisez IssueSync pour créer des tâches basées sur des issues GitHub dans VS Code ou d'autres systèmes.
+Use IssueSync to create tasks based on GitHub issues in VS Code or other systems.
 
 ```javascript
-// Exemple dans une extension VS Code
+// Example in a VS Code extension
 const vscode = require('vscode');
 const issueSync = require('issuesync');
 
 function activate(context) {
-  // Commande pour créer des tâches à partir des issues GitHub
+  // Command to create tasks from GitHub issues
   let disposable = vscode.commands.registerCommand('extension.createTasksFromIssues', async () => {
     // Configuration
     const config = vscode.workspace.getConfiguration('myExtension');
     const token = config.get('githubToken');
     
-    // Initialiser IssueSync
+    // Initialize IssueSync
     issueSync.init({ token });
     
-    try {
-      // Récupérer et présenter les issues
-      const owner = await vscode.window.showInputBox({ prompt: 'Propriétaire du dépôt' });
-      const repo = await vscode.window.showInputBox({ prompt: 'Nom du dépôt' });
+    try {      // Retrieve and present issues
+      const owner = await vscode.window.showInputBox({ prompt: 'Repository owner' });
+      const repo = await vscode.window.showInputBox({ prompt: 'Repository name' });
       const issues = await issueSync.listIssues({ owner, repo, state: 'open' });
       
       const selectedIssue = await vscode.window.showQuickPick(
@@ -292,11 +291,11 @@ function activate(context) {
       );
       
       if (selectedIssue) {
-        // Créer une tâche à partir de l'issue sélectionnée
+        // Create a task from the selected issue
         await createTask(selectedIssue.issue);
       }
     } catch (error) {
-      vscode.window.showErrorMessage(`Erreur: ${error.message}`);
+      vscode.window.showErrorMessage(`Error: ${error.message}`);
     }
   });
 
@@ -304,15 +303,15 @@ function activate(context) {
 }
 ```
 
-## Fonctionnalités
+## Features
 
-- **Multi-fonctionnel** : Utilisable comme bibliothèque dans tout projet Node.js ou comme outil CLI
-- **Flexible** : S'intègre dans différents contextes (web, CLI, automatisation, extensions)
-- **Puissant** : Listing et filtrage avancés des issues GitHub
-- **Synchronisation complète** : Transfert des issues entre dépôts avec conservation des métadonnées
-- **Intelligent** : Création automatique des étiquettes et gestion des duplications
-- **API simple** : Interface claire et bien documentée
-- **Extensible** : Facile à étendre pour des besoins spécifiques
+- **Multi-functional**: Usable as a library in any Node.js project or as a CLI tool
+- **Flexible**: Integrates in different contexts (web, CLI, automation, extensions)
+- **Powerful**: Advanced GitHub issue listing and filtering
+- **Complete synchronization**: Transfer issues between repositories with metadata preservation
+- **Intelligent**: Automatic label creation and duplicate management
+- **Simple API**: Clear and well-documented interface
+- **Extensible**: Easy to extend for specific needs
 
 ## Requirements
 
