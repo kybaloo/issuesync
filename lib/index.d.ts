@@ -1,5 +1,5 @@
 /**
- * Interface pour une étiquette d'issue GitHub
+ * Interface for a GitHub issue label
  */
 interface GitHubLabel {
   id: number;
@@ -9,7 +9,7 @@ interface GitHubLabel {
 }
 
 /**
- * Interface pour une issue GitHub
+ * Interface for a GitHub issue
  */
 interface GitHubIssue {
   id: number;
@@ -31,77 +31,77 @@ interface GitHubIssue {
 }
 
 /**
- * Options pour initialiser IssueSync
+ * Options to initialize IssueSync
  */
 interface InitOptions {
-  /** Token d'authentification GitHub */
+  /** GitHub authentication token */
   token?: string;
 }
 
 /**
- * Options pour lister les issues
+ * Options to list issues
  */
 interface ListIssuesOptions {
-  /** Propriétaire du dépôt */
+  /** Repository owner */
   owner: string;
-  /** Nom du dépôt */
+  /** Repository name */
   repo: string;
-  /** État des issues (ouvert, fermé, tous) */
+  /** Issue state (open, closed, all) */
   state?: 'open' | 'closed' | 'all';
-  /** Étiquettes pour filtrer les issues (séparées par des virgules) */
+  /** Labels to filter issues (comma-separated) */
   labels?: string;
-  /** Afficher des informations détaillées */
+  /** Show detailed information */
   verbose?: boolean;
 }
 
 /**
- * Options pour synchroniser les issues
+ * Options to synchronize issues
  */
 interface SyncIssuesOptions {
-  /** Propriétaire du dépôt source */
+  /** Source repository owner */
   sourceOwner: string;
-  /** Nom du dépôt source */
+  /** Source repository name */
   sourceRepo: string;
-  /** Propriétaire du dépôt cible */
+  /** Target repository owner */
   targetOwner: string;
-  /** Nom du dépôt cible */
+  /** Target repository name */
   targetRepo: string;
-  /** État des issues à synchroniser */
+  /** Issue state to synchronize */
   state?: 'open' | 'closed' | 'all';
-  /** Étiquettes pour filtrer les issues (séparées par des virgules) */
+  /** Labels to filter issues (comma-separated) */
   labels?: string;
-  /** Synchroniser les commentaires des issues */
+  /** Synchronize issue comments */
   syncComments?: boolean;
 }
 
 /**
- * Résultat de la synchronisation des issues
+ * Result of issues synchronization
  */
 interface SyncResult {
-  /** Issues créées dans le dépôt cible */
+  /** Issues created in the target repository */
   created: GitHubIssue[];
-  /** Issues ignorées (car déjà présentes) */
+  /** Issues ignored (already present) */
   skipped: GitHubIssue[];
-  /** Nombre total d'issues dans le dépôt source */
+  /** Total number of issues in the source repository */
   total: number;
 }
 
 /**
- * Initialiser la bibliothèque IssueSync avec les informations d'identification GitHub
- * @param options - Options de configuration
+ * Initialize the IssueSync library with GitHub credentials
+ * @param options - Configuration options
  */
 export function init(options?: InitOptions): void;
 
 /**
- * Lister les issues d'un dépôt GitHub avec des filtres optionnels
- * @param options - Options pour lister les issues
- * @returns Une promesse résolvant en un tableau d'issues
+ * List issues from a GitHub repository with optional filters
+ * @param options - Options to list issues
+ * @returns A promise resolving to an array of issues
  */
 export function listIssues(options: ListIssuesOptions): Promise<GitHubIssue[]>;
 
 /**
- * Synchroniser les issues d'un dépôt source vers un dépôt cible
- * @param options - Options de synchronisation
- * @returns Une promesse résolvant en un objet contenant les résultats
+ * Synchronize issues from a source repository to a target repository
+ * @param options - Options for synchronization
+ * @returns A promise resolving to an object containing the results
  */
 export function syncIssues(options: SyncIssuesOptions): Promise<SyncResult>;
