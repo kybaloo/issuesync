@@ -1,31 +1,31 @@
-/**
- * Exemple d'intégration avec une extension VS Code
+﻿/**
+ * Example of integration with a VS Code extension
  * 
- * Ce fichier démontre comment IssueSync pourrait être utilisé dans une extension VS Code.
+ * This file demonstrates how issuesync could be used in a VS Code extension.
  */
 
 const vscode = require('vscode');
-const issueSync = require('issuesync');
+const issuesync = require('issuesync');
 
 /**
- * Fonction d'activation de l'extension
+ * Extension activation function
  */
 function activate(context) {
-  // Initialisation avec le token GitHub (à partir des paramètres de l'extension)
+  // Initialize with GitHub token (from extension settings)
   const config = vscode.workspace.getConfiguration('taskManagerExtension');
   const token = config.get('githubToken');
   
   if (token) {
-    issueSync.init({ token });
+    issuesync.init({ token });
   }
   
-  // Commande pour créer des tâches à partir d'issues GitHub
+  // Command to create tasks from GitHub issues
   const createTasksCommand = vscode.commands.registerCommand('extension.createTasksFromGithub', async () => {
-    // Vérifie si le token est configuré
+    // Verify if the token is configured
     if (!token) {
       const configureNow = await vscode.window.showErrorMessage(
-        'GitHub token non configuré. Veuillez le configurer dans les paramètres.',
-        'Configurer maintenant'
+        'GitHub token not configured. Please configure it in the settings.',
+        'Configure Now'
       );
       
       if (configureNow) {
@@ -35,40 +35,40 @@ function activate(context) {
     }
     
     try {
-      // Demander à l'utilisateur les informations du dépôt
+      // ask the user for the repository information
       const owner = await vscode.window.showInputBox({
-        placeHolder: 'Propriétaire du dépôt (ex: microsoft)',
-        prompt: 'Entrez le propriétaire du dépôt GitHub'
+        placeHolder: 'Owner of the repository (ex: microsoft)',
+        prompt: 'Enter the owner of the GitHub repository'
       });
       
       if (!owner) return;
       
       const repo = await vscode.window.showInputBox({
-        placeHolder: 'Nom du dépôt (ex: vscode)',
-        prompt: 'Entrez le nom du dépôt GitHub'
+        placeHolder: 'Name of the repository (ex: vscode)',
+        prompt: 'Enter the name of the GitHub repository'
       });
       
       if (!repo) return;
       
-      // Récupérer les issues
+      // retrieve issues
       vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
-        title: `Récupération des issues de ${owner}/${repo}...`,
+        title: `Retrieving issues from ${owner}/${repo}...`,
         cancellable: false
       }, async () => {
-        // Récupérer les issues avec le statut ouvert
-        const issues = await issueSync.listIssues({ 
+        // retrieve issues with the status open
+        const issues = await issuesync.listissues({ 
           owner, 
           repo, 
           state: 'open' 
         });
         
         if (issues.length === 0) {
-          vscode.window.showInformationMessage(`Aucune issue trouvée dans ${owner}/${repo}`);
+          vscode.window.showInformationMessage(`No issues found in ${owner}/${repo}`);
           return;
         }
-        
-        // Afficher les issues dans une liste de sélection
+
+        // display the issues in a selection list
         const selectedIssue = await vscode.window.showQuickPick(
           issues.map(issue => ({
             label: issue.title,
@@ -76,23 +76,23 @@ function activate(context) {
             detail: `Labels: ${issue.labels.map(l => l.name).join(', ')}`,
             issue
           })),
-          { placeHolder: 'Sélectionnez une issue pour créer une tâche' }
+          { placeHolder: 'Select an issue to create a task for' }
         );
         
         if (!selectedIssue) return;
-        
-        // Ici, on peut passer l'issue à Copilot pour générer une tâche
-        // Par exemple, en créant un fichier de tâche dans .vscode/tasks.json
-        
+
+        // Here, we can pass the issue to Copilot to generate a task
+        // For example, by creating a task file in .vscode/tasks.json
+
         const taskTitle = selectedIssue.issue.title;
         const taskDescription = selectedIssue.issue.body || '';
         const taskLabels = selectedIssue.issue.labels.map(l => l.name);
         
-        // Générer une tâche VS Code
+        // generate une task VS Code
         const task = {
           label: `GitHub #${selectedIssue.issue.number}: ${taskTitle}`,
           type: 'shell',
-          command: 'echo "Travail sur tâche #${selectedIssue.issue.number}"',
+          command: 'echo "Working on task #${selectedIssue.issue.number}"',
           problemMatcher: [],
           group: {
             kind: 'build',
@@ -103,17 +103,17 @@ function activate(context) {
             panel: 'new'
           }
         };
-        
-        // Afficher la tâche générée ou l'enregistrer
-        vscode.window.showInformationMessage(`Tâche créée: ${task.label}`);
-        
-        // Ici, on peut soit:
-        // 1. Appeler la fonction de l'extension Copilot pour générer plus de détails
-        // 2. Enregistrer directement dans le fichier tasks.json de l'espace de travail
-        // 3. Exécuter la tâche immédiatement
+
+        // display the generated task or save it
+        vscode.window.showInformationMessage(`Task created: ${task.label}`);
+
+        // Here, we can either:
+        // 1. Call the Copilot extension function to generate more details
+        // 2. Save it directly to the tasks.json file in the workspace
+        // 3. Execute the task immediately
       });
     } catch (error) {
-      vscode.window.showErrorMessage(`Erreur: ${error.message}`);
+      vscode.window.showErrorMessage(`error: ${error.message}`);
     }
   });
   
@@ -121,7 +121,7 @@ function activate(context) {
 }
 
 /**
- * Fonction de désactivation de l'extension
+ * Extension Disable Function
  */
 function deactivate() {}
 
