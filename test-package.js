@@ -2,15 +2,15 @@
 
 // filepath: d:\Projects\Personal\IssueSync\test-package.js
 /**
- * Script de test pour vérifier que le package est prêt pour la publication
+ * Test script to verify that the package is ready for publication
  */
 
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔍 Vérification de la préparation du package IssueSync...\n');
+console.log('🔍 Checking IssueSync package readiness...\n');
 
-// Vérifier les fichiers essentiels
+// Check essential files
 const requiredFiles = [
   'package.json',
   'README.md',
@@ -23,93 +23,92 @@ const requiredFiles = [
 
 let allFilesExist = true;
 
-console.log('📁 Vérification des fichiers essentiels:');
+console.log('📁 Checking essential files:');
 for (const file of requiredFiles) {
   const exists = fs.existsSync(path.join(__dirname, file));
   console.log(`  ${exists ? '✅' : '❌'} ${file}`);
   if (!exists) allFilesExist = false;
 }
 
-// Vérifier le package.json
-console.log('\n📦 Vérification du package.json:');
+// Check package.json
+console.log('\n📦 Checking package.json:');
 try {
   const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'));
   
   const checks = [
-    ['Nom', pkg.name, pkg.name === 'issuesync'],
+    ['Name', pkg.name, pkg.name === 'issuesync'],
     ['Version', pkg.version, !!pkg.version],
     ['Description', pkg.description, !!pkg.description],
-    ['Point d\'entrée principal', pkg.main, pkg.main === 'lib/index.js'],
-    ['Binaire CLI', pkg.bin?.issuesync, pkg.bin?.issuesync === './cli.js'],
-    ['Licence', pkg.license, pkg.license === 'MIT'],
-    ['Dépendances', 'octokit, dotenv, yargs', !!pkg.dependencies?.['@octokit/rest']],
+    ['Main entry point', pkg.main, pkg.main === 'lib/index.js'],
+    ['CLI binary', pkg.bin?.issuesync, pkg.bin?.issuesync === './cli.js'],
+    ['License', pkg.license, pkg.license === 'MIT'],
+    ['Dependencies', 'octokit, dotenv, yargs', !!pkg.dependencies?.['@octokit/rest']],
   ];
   
   for (const [label, value, isValid] of checks) {
     console.log(`  ${isValid ? '✅' : '❌'} ${label}: ${value}`);
   }
 } catch (error) {
-  console.log('  ❌ Erreur lors de la lecture du package.json:', error.message);
+  console.log('  ❌ Error reading package.json:', error.message);
   allFilesExist = false;
 }
 
-// Tester l'import de la bibliothèque
-console.log('\n🔧 Test d\'import de la bibliothèque:');
+// Test library import
+console.log('\n🔧 Testing library import:');
 try {
   const issueSync = require('./lib');
-  const methods = Object.keys(issueSync);
-  console.log('  ✅ Import réussi');
-  console.log('  ✅ Méthodes disponibles:', methods.join(', '));
+  const methods = Object.keys(issueSync);  console.log('  ✅ Import successful');
+  console.log('  ✅ Available methods:', methods.join(', '));
   
-  // Vérifier que les méthodes essentielles existent
+  // Check that essential methods exist
   const requiredMethods = ['init', 'listIssues', 'syncIssues'];
   const hasAllMethods = requiredMethods.every(method => methods.includes(method));
-  console.log(`  ${hasAllMethods ? '✅' : '❌'} Toutes les méthodes requises sont présentes`);
+  console.log(`  ${hasAllMethods ? '✅' : '❌'} All required methods are present`);
 } catch (error) {
-  console.log('  ❌ Erreur lors de l\'import:', error.message);
+  console.log('  ❌ Import error:', error.message);
   allFilesExist = false;
 }
 
-// Tester la syntaxe des fichiers
-console.log('\n🔍 Test de syntaxe:');
+// Test file syntax
+console.log('\n🔍 Syntax testing:');
 try {
   require('./lib/index.js');
-  console.log('  ✅ lib/index.js - syntaxe valide');
+  console.log('  ✅ lib/index.js - valid syntax');
 } catch (error) {
-  console.log('  ❌ lib/index.js - erreur de syntaxe:', error.message);
+  console.log('  ❌ lib/index.js - syntax error:', error.message);
   allFilesExist = false;
 }
 
 try {
-  // Simplement vérifier que le fichier peut être lu (pas exécuté car il nécessite les arguments CLI)
+  // Simply check that the file can be read (not executed as it requires CLI arguments)
   fs.readFileSync('./cli.js', 'utf8');
-  console.log('  ✅ cli.js - fichier lisible');
+  console.log('  ✅ cli.js - file readable');
 } catch (error) {
-  console.log('  ❌ cli.js - erreur:', error.message);
+  console.log('  ❌ cli.js - error:', error.message);
   allFilesExist = false;
 }
 
-// Vérifier les définitions TypeScript
-console.log('\n📝 Vérification des définitions TypeScript:');
+// Check TypeScript definitions
+console.log('\n📝 Checking TypeScript definitions:');
 try {
   const tsContent = fs.readFileSync('./lib/index.d.ts', 'utf8');
   const hasExports = tsContent.includes('export function');
-  console.log(`  ${hasExports ? '✅' : '❌'} Définitions TypeScript présentes`);
+  console.log(`  ${hasExports ? '✅' : '❌'} TypeScript definitions present`);
 } catch (error) {
-  console.log('  ❌ Erreur lors de la lecture des définitions TypeScript:', error.message);
+  console.log('  ❌ Error reading TypeScript definitions:', error.message);
 }
 
-// Résumé final
+// Final summary
 console.log('\n' + '='.repeat(50));
 if (allFilesExist) {
-  console.log('🎉 SUCCÈS: Le package IssueSync est prêt pour la publication!');
-  console.log('\nPour publier sur npm:');
+  console.log('🎉 SUCCESS: The IssueSync package is ready for publication!');
+  console.log('\nTo publish to npm:');
   console.log('  1. npm login');
   console.log('  2. npm publish');
-  console.log('\nPour installer globalement:');
+  console.log('\nTo install globally:');
   console.log('  npm install -g issuesync');
 } else {
-  console.log('❌ ÉCHEC: Le package n\'est pas encore prêt pour la publication.');
-  console.log('Veuillez corriger les erreurs ci-dessus avant de publier.');
+  console.log('❌ FAILURE: The package is not yet ready for publication.');
+  console.log('Please fix the errors above before publishing.');
 }
 console.log('='.repeat(50));
