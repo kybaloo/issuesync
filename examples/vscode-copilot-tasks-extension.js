@@ -1,47 +1,47 @@
-/**
- * Exemple d'intégration avec une extension VS Code utilisant Copilot pour les tâches
+﻿/**
+ * Example of integration with a VS Code extension using Copilot for tasks
  * 
- * Ce fichier montre comment IssueSync peut être intégré dans une extension
- * qui utilise Copilot pour générer des tâches à partir d'issues GitHub.
+ * This file shows how issuesync can be integrated into an extension
+ * that uses Copilot to generate tasks from GitHub issues.
  */
 
 const vscode = require('vscode');
-const issueSync = require('issuesync'); // Notre bibliothèque
-// Hypothétique API de l'extension Copilot pour les tâches
+const issuesync = require('issuesync'); // Our library
+// Hypothetical Copilot task extension API
 const copilotTaskAPI = require('copilot-tasks-api');
 
 /**
- * Fonction d'activation de l'extension
+ * Extension activation function
  */
 function activate(context) {
-  console.log('Extension "VS Code Copilot Tasks avec IssueSync" est activée');
+  console.log('Extension is activated');
 
-  // Configuration de l'extension
+  // Configuration of the extension
   const config = vscode.workspace.getConfiguration('copilotTaskExtension');
   const token = config.get('githubToken');
   
   if (token) {
-    issueSync.init({ token });
+    issuesync.init({ token });
   }
   
-  // Commande pour générer des tâches avec Copilot à partir d'issues GitHub
-  const generateTaskCommand = vscode.commands.registerCommand('extension.generateTasksFromGithubIssues', async () => {
+  // Command to generate tasks with Copilot from GitHub issues
+  const generateTaskCommand = vscode.commands.registerCommand('extension.generateTasksFromGithubissues', async () => {
     try {
-      // 1. Récupérer les issues GitHub avec IssueSync
+      // 1. retrieve les issues GitHub with issuesync
       const repoDetails = await promptForRepositoryDetails();
       if (!repoDetails) return;
       
       const { owner, repo, state } = repoDetails;
       
-      // Afficher un indicateur de progression pendant la récupération des issues
+      // display a progress indicator during the retrieval of the issues
       const issues = await vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
-          title: `Récupération des issues de ${owner}/${repo}...`,
+          title: `Retrieving issues from ${owner}/${repo}...`,
           cancellable: false
         },
         async () => {
-          return await issueSync.listIssues({ 
+          return await issuesync.listissues({ 
             owner, 
             repo, 
             state: state || 'open'
@@ -50,17 +50,17 @@ function activate(context) {
       );
       
       if (!issues || issues.length === 0) {
-        vscode.window.showInformationMessage(`Aucune issue trouvée dans ${owner}/${repo}`);
+        vscode.window.showInformationMessage(`No issues found in ${owner}/${repo}`);
         return;
       }
-      
-      // 2. Permettre à l'utilisateur de sélectionner les issues à utiliser
+
+      // 2. allow the user to select the issues to use
       const selectedIssues = await promptForIssueSelection(issues);
       if (!selectedIssues || selectedIssues.length === 0) return;
-      
-      // 3. Pour chaque issue sélectionnée, générer une tâche avec Copilot
+
+      // 3. for each selected issue, generate a task with Copilot
       for (const issue of selectedIssues) {
-        // Formater l'issue pour Copilot
+        // Format the issue for Copilot
         const issueData = {
           title: issue.title,
           description: issue.body || '',
@@ -69,35 +69,35 @@ function activate(context) {
           url: issue.html_url,
           state: issue.state
         };
-        
-        // Utiliser l'API Copilot pour générer une tâche
+
+        // Use the Copilot API to generate a task
         await vscode.window.withProgress(
           {
             location: vscode.ProgressLocation.Notification,
-            title: `Génération d'une tâche pour l'issue #${issue.number}...`,
+            title: `Generating task for issue #${issue.number}...`,
             cancellable: false
           },
           async () => {
             try {
-              // Appel hypothétique à l'API Copilot
+              // Hypothetical call to the Copilot API
               const generatedTask = await copilotTaskAPI.generateTaskFromIssue(issueData);
-              
-              // Ajouter la tâche au fichier tasks.json
+
+              // Add the task to the tasks.json file
               await addTaskToWorkspace(generatedTask, issue);
               
               vscode.window.showInformationMessage(
-                `Tâche créée pour l'issue #${issue.number}: ${issue.title}`
+                `Task created for issue #${issue.number}: ${issue.title}`
               );
             } catch (error) {
               vscode.window.showErrorMessage(
-                `Erreur lors de la génération de la tâche pour l'issue #${issue.number}: ${error.message}`
+                `Error during generation of the task for issue #${issue.number}: ${error.message}`
               );
             }
           }
         );
       }
     } catch (error) {
-      vscode.window.showErrorMessage(`Erreur: ${error.message}`);
+      vscode.window.showErrorMessage(`error: ${error.message}`);
     }
   });
   
@@ -105,33 +105,33 @@ function activate(context) {
 }
 
 /**
- * Demande à l'utilisateur de fournir les détails du dépôt GitHub
+ * Prompt the user for the details of the GitHub repository
  */
 async function promptForRepositoryDetails() {
-  // Demander le propriétaire du dépôt
+  // Ask for the owner of the repository
   const owner = await vscode.window.showInputBox({
-    placeHolder: 'Propriétaire du dépôt (ex: microsoft)',
-    prompt: 'Entrez le propriétaire du dépôt GitHub'
+    placeHolder: 'Owner of the repository (ex: microsoft)',
+    prompt: 'Enter the owner of the GitHub repository'
   });
   
   if (!owner) return null;
-  
-  // Demander le nom du dépôt
+
+  // ask the name of the repository
   const repo = await vscode.window.showInputBox({
-    placeHolder: 'Nom du dépôt (ex: vscode)',
-    prompt: 'Entrez le nom du dépôt GitHub'
+    placeHolder: 'Name of the repository (ex: vscode)',
+    prompt: 'Enter the name of the GitHub repository'
   });
   
   if (!repo) return null;
-  
-  // Demander l'état des issues à récupérer
+
+  // ask the state of the issues to retrieve
   const state = await vscode.window.showQuickPick(
     [
-      { label: 'Ouvertes', description: 'Issues ouvertes', value: 'open' },
-      { label: 'Fermées', description: 'Issues fermées', value: 'closed' },
-      { label: 'Toutes', description: 'Toutes les issues', value: 'all' }
+      { label: 'Opened', description: 'Opened Issues', value: 'open' },
+      { label: 'Closed', description: 'Closed Issues', value: 'closed' },
+      { label: 'All', description: 'All Issues', value: 'all' }
     ],
-    { placeHolder: 'Sélectionnez l\'état des issues à récupérer' }
+    { placeHolder: 'Select the state of the issues to retrieve' }
   );
   
   if (!state) return null;
@@ -140,7 +140,7 @@ async function promptForRepositoryDetails() {
 }
 
 /**
- * Permet à l'utilisateur de sélectionner les issues à utiliser
+ * Allow the user to select the issues to use
  */
 async function promptForIssueSelection(issues) {
   const issueItems = issues.map(issue => ({
@@ -153,43 +153,43 @@ async function promptForIssueSelection(issues) {
   return await vscode.window.showQuickPick(
     issueItems,
     { 
-      placeHolder: 'Sélectionnez des issues pour générer des tâches', 
+      placeHolder: 'Select the issues to generate tasks for', 
       canPickMany: true 
     }
   ).then(selections => selections?.map(selection => selection.issue) || []);
 }
 
 /**
- * Ajoute une tâche générée au fichier tasks.json de l'espace de travail
+ * Add a generated task to the tasks.json file of the workspace
  */
 async function addTaskToWorkspace(generatedTask, issue) {
-  // Vérifier si un espace de travail est ouvert
+  // Check if a workspace is open
   if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
-    throw new Error('Aucun espace de travail ouvert');
+    throw new Error('No workspace open');
   }
   
   const workspaceFolder = vscode.workspace.workspaceFolders[0];
   const tasksJsonPath = vscode.Uri.joinPath(workspaceFolder.uri, '.vscode', 'tasks.json');
-  
-  // Lire le fichier tasks.json existant ou créer un modèle
+
+  // Read the existing tasks.json file or create a template
   let tasksConfig;
   try {
     const content = await vscode.workspace.fs.readFile(tasksJsonPath);
     tasksConfig = JSON.parse(content.toString());
   } catch {
-    // Le fichier n'existe pas, créer un modèle
+    // The file does not exist, create a template
     tasksConfig = {
       version: '2.0.0',
       tasks: []
     };
-    
-    // S'assurer que le dossier .vscode existe
+
+    // Ensure that the .vscode folder exists
     await vscode.workspace.fs.createDirectory(
       vscode.Uri.joinPath(workspaceFolder.uri, '.vscode')
     );
   }
-  
-  // Formater la tâche générée par Copilot
+
+  // Format task generated by Copilot
   const task = {
     ...generatedTask,
     label: `GitHub #${issue.number}: ${generatedTask.label || issue.title}`,
@@ -199,7 +199,8 @@ async function addTaskToWorkspace(generatedTask, issue) {
       panel: 'shared',
       showReuseMessage: false
     },
-    // Ajouter des métadonnées pour lier la tâche à l'issue
+
+    // Add metadata to link the task to the issue
     metadata: {
       githubIssue: {
         number: issue.number,
@@ -208,11 +209,11 @@ async function addTaskToWorkspace(generatedTask, issue) {
       }
     }
   };
-  
-  // Ajouter la nouvelle tâche
+
+  // Add the new task
   tasksConfig.tasks.push(task);
-  
-  // Écrire le fichier mis à jour
+
+  // Write the updated file
   await vscode.workspace.fs.writeFile(
     tasksJsonPath,
     Buffer.from(JSON.stringify(tasksConfig, null, 2))
@@ -220,7 +221,7 @@ async function addTaskToWorkspace(generatedTask, issue) {
 }
 
 /**
- * Fonction de désactivation de l'extension
+ * Extension Disable Function
  */
 function deactivate() {}
 
