@@ -1,85 +1,84 @@
-<!--filepath: d:\Projects\Personal\IssueSync\examples\example-vscode-extension\README.md -->
+﻿<!--filepath: d:\Projects\Personal\issuesync\examples\example-vscode-extension\README.md -->
 # GitHub Task Generator
 
-Cette extension VS Code permet de générer automatiquement des tâches à partir d'issues GitHub. Elle utilise la bibliothèque `issuesync` pour communiquer avec l'API GitHub et récupérer les issues.
+This VS Code extension allows automatic generation of tasks from GitHub issues. It uses the `issuesync` library to communicate with the GitHub API and retrieve issues.
 
-## Fonctionnalités
+## Features
 
-- Connexion à GitHub via un token d'accès personnel
-- Récupération des issues ouvertes d'un dépôt GitHub
-- Sélection interactive d'issues dans une liste
-- Création automatique de tâches VS Code basées sur les issues
-- Liaison des tâches avec les issues GitHub correspondantes
+- Connect to GitHub via personal access token
+- Retrieve open issues from a GitHub repository
+- Interactive issue selection from a list
+- Automatic creation of VS Code tasks based on issues
+- Link tasks with corresponding GitHub issues
 
-## Configuration de l'extension
+## Extension Configuration
 
-1. Installez l'extension
-2. Ouvrez les paramètres VS Code (Ctrl+,)
-3. Recherchez "GitHub Task Generator"
-4. Configurez les options suivantes :
-   - `githubTaskGenerator.token` : Votre token d'accès personnel GitHub
-   - `githubTaskGenerator.defaultOwner` : Propriétaire par défaut du dépôt (facultatif)
-   - `githubTaskGenerator.defaultRepo` : Nom par défaut du dépôt (facultatif)
+1. Install the extension
+2. Open VS Code settings (Ctrl+,)
+3. Search for "GitHub Task Generator"
+4. Configure the following options:
+   - `githubTaskGenerator.token`: Your GitHub personal access token
+   - `githubTaskGenerator.defaultOwner`: Default repository owner (optional)
+   - `githubTaskGenerator.defaultRepo`: Default repository name (optional)
 
-## Utilisation
+## Usage
 
-1. Ouvrez un espace de travail VS Code
-2. Exécutez la commande `Générer des tâches à partir d'issues GitHub` depuis la palette de commandes (Ctrl+Shift+P)
-3. Entrez le propriétaire et le nom du dépôt (si non définis par défaut)
-4. Sélectionnez une issue dans la liste qui apparaît
-5. Choisissez le type de tâche (shell, npm)
-6. Entrez la commande à exécuter
-7. Une tâche sera créée dans le fichier `.vscode/tasks.json` de votre espace de travail
+1. Open a VS Code workspace
+2. Execute the command `Generate tasks from GitHub issues` from the command palette (Ctrl+Shift+P)
+3. Enter the owner and repository name (if not set by default)
+4. Select an issue from the list that appears
+5. Choose the task type (shell, npm)
+6. Enter the command to execute
+7. A task will be created in the `.vscode/tasks.json` file of your workspace
 
-## Comment ça marche
+## How it Works
 
-L'extension utilise la bibliothèque `issuesync` pour communiquer avec l'API GitHub. Les étapes principales sont :
+The extension uses the `issuesync` library to communicate with the GitHub API. The main steps are:
 
-1. Initialisation avec le token GitHub
-2. Récupération des issues ouvertes du dépôt spécifié
-3. Affichage des issues dans une liste interactive
-4. Création d'une tâche VS Code basée sur l'issue sélectionnée
-5. Ajout de la tâche au fichier `.vscode/tasks.json`
+1. Initialize with GitHub token
+2. Retrieve open issues from the specified repository
+3. Display issues in an interactive list
+4. Create a VS Code task based on the selected issue
+5. Add the task to the `.vscode/tasks.json` file
 
-## Développement
+## Development
 
-### Structure du projet
+### Project Structure
 
 ```
 example-vscode-extension/
-  ├── package.json      # Configuration de l'extension
-  ├── extension.js      # Code principal de l'extension
-  └── README.md         # Documentation
+  ├── package.json      # Extension configuration
+  ├── extension.js      # Main extension code  └── README.md         # Documentation
 ```
 
-### Déboguer l'extension
+### Debug the Extension
 
-1. Ouvrir le dossier dans VS Code
-2. Appuyer sur F5 pour lancer une nouvelle fenêtre VS Code avec l'extension
-3. Exécuter la commande `Générer des tâches à partir d'issues GitHub`
+1. Open the folder in VS Code
+2. Press F5 to launch a new VS Code window with the extension
+3. Execute the command `Generate tasks from GitHub issues`
 
-### Utilisation d'IssueSync
+### Using issuesync
 
-Cette extension montre comment intégrer la bibliothèque `issuesync` dans une extension VS Code :
+This extension shows how to integrate the `issuesync` library into a VS Code extension:
 
 ```javascript
-// Importer la bibliothèque
-const issueSync = require('issuesync');
+// Import the library
+const issuesync = require('issuesync');
 
-// Initialiser avec le token GitHub
-issueSync.init({ token: 'votre-token-github' });
+// Initialize with GitHub token
+issuesync.init({ token: 'your-github-token' });
 
-// Récupérer les issues
-const issues = await issueSync.listIssues({ 
-  owner: 'propriétaire-du-dépôt', 
-  repo: 'nom-du-dépôt',
+// Retrieve issues
+const issues = await issuesync.listissues({ 
+  owner: 'repository-owner', 
+  repo: 'repository-name',
   state: 'open' 
 });
 
-// Utiliser les issues récupérées
-console.log(`${issues.length} issues récupérées`);
+// Use the retrieved issues
+console.log(`${issues.length} issues retrieved`);
 ```
 
-## Licence
+## License
 
-Cette extension est distribuée sous la licence MIT. Voir le fichier LICENSE pour plus d'informations.
+This extension is distributed under the MIT license. See the LICENSE file for more information.
