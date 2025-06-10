@@ -1,11 +1,11 @@
-/**
- * Exemple d'intégration d'IssueSync dans un pipeline CI/CD
+﻿/**
+ * Example of issuesync integration in a CI/CD pipeline
  * 
- * Ce fichier montre comment IssueSync peut être utilisé dans un workflow
- * d'automatisation pour synchroniser les issues entre dépôts après un déploiement.
+ * This file shows how issuesync can be used in an automation workflow
+ * to synchronize issues between repositories after deployment.
  */
 
-const issueSync = require('issuesync');
+const issuesync = require('issuesync');
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -21,41 +21,41 @@ const CONFIG = {
   logFile: process.env.LOG_FILE || 'sync-results.json',
 };
 
-// Fonction principale d'exécution
+// Execution principale function
 async function main() {
   try {
-    console.log('🔄 Démarrage de la synchronisation des issues pour le déploiement...');
+    console.log('🔄 Starting synchronization of the issues for deployment...');
     console.log(`🏷️  Version: ${CONFIG.releaseTag}`);
     
-    // Vérifier la présence du token GitHub
+    // check presence of the GitHub token
     if (!CONFIG.token) {
-      throw new Error('Token GitHub non configuré. Définissez la variable d\'environnement GITHUB_TOKEN.');
+      throw new Error('GitHub token not configured. Please set the GITHUB_TOKEN environment variable.');
     }
     
-    // Initialiser IssueSync
-    issueSync.init({ token: CONFIG.token });
+    // Initialize issuesync
+    issuesync.init({ token: CONFIG.token });
     
-    // Récupérer les issues avec le label de déploiement
-    console.log(`🔍 Récupération des issues avec le label "${CONFIG.issueLabel}"...`);
-    
-    const issues = await issueSync.listIssues({
+    // retrieve issues with the deployment label
+    console.log(`🔍 Retrieving issues with the label "${CONFIG.issueLabel}"...`);
+
+    const issues = await issuesync.listissues({
       owner: CONFIG.sourceOwner,
       repo: CONFIG.sourceRepo,
       state: 'open',
       labels: CONFIG.issueLabel
     });
-    
-    console.log(`📋 ${issues.length} issues trouvées à déployer`);
-    
+
+    console.log(`📋 ${issues.length} issues found to deploy`);
+
     if (issues.length === 0) {
-      console.log('✅ Aucune issue à synchroniser');
+      console.log('✅ No issues to synchronize');
       return { success: true, issues: [] };
     }
     
-    // Synchroniser les issues
-    console.log(`🔄 Synchronisation des issues vers ${CONFIG.targetOwner}/${CONFIG.targetRepo}...`);
-    
-    const result = await issueSync.syncIssues({
+    // synchronize issues
+    console.log(`🔄 Synchronizing issues to ${CONFIG.targetOwner}/${CONFIG.targetRepo}...`);
+
+    const result = await issuesync.syncissues({
       sourceOwner: CONFIG.sourceOwner,
       sourceRepo: CONFIG.sourceRepo,
       targetOwner: CONFIG.targetOwner,
@@ -64,41 +64,41 @@ async function main() {
       labels: CONFIG.issueLabel,
       syncComments: true
     });
-    
-    // Convertir les issues créées en format simplifié pour le log
-    const createdIssues = result.created.map(issue => ({
+
+    // Convert the created issues to a simplified format for logging
+    const createdissues = result.created.map(issue => ({
       number: issue.number,
       title: issue.title,
       url: issue.html_url,
       labels: issue.labels.map(l => l.name)
     }));
-    
-    // Log les résultats
+
+    // Log the results
     const syncResults = {
       timestamp: new Date().toISOString(),
       release: CONFIG.releaseTag,
       source: `${CONFIG.sourceOwner}/${CONFIG.sourceRepo}`,
       target: `${CONFIG.targetOwner}/${CONFIG.targetRepo}`,
-      created: createdIssues,
+      created: createdissues,
       skipped: result.skipped.length,
       total: result.total
     };
-    
-    // Sauvegarder le résultat
+
+    // saving the results
     await saveResults(syncResults);
-    
-    // Mettre à jour les issues source pour indiquer qu'elles ont été déployées
-    if (createdIssues.length > 0) {
-      console.log(`🏷️  Mise à jour des issues source avec le label "deployed"...`);
-      
-      // Cette partie utiliserait directement l'API Octokit qui est incluse dans IssueSync
-      // Dans une implémentation réelle, cette fonctionnalité pourrait être ajoutée à IssueSync
-      
-      console.log(`✅ Issues mises à jour avec succès`);
+
+    // update the source issues to indicate they have been deployed
+    if (createdissues.length > 0) {
+      console.log(`🏷️  Updating source issues with the label "deployed"...`);
+
+      // This part would directly use the Octokit API which is included in issuesync
+      // In a real implementation, this functionality could be added to issuesync
+
+      console.log(`✅ Issues updated successfully`);
     }
-    
-    console.log(`✅ Synchronisation terminée: ${result.created.length} issues créées, ${result.skipped.length} ignorées`);
-    
+
+    console.log(`✅ Synchronization completed: ${result.created.length} issues created, ${result.skipped.length} ignored`);
+
     return {
       success: true,
       created: result.created.length,
@@ -106,9 +106,9 @@ async function main() {
       total: result.total
     };
   } catch (error) {
-    console.error(`❌ Erreur lors de la synchronisation: ${error.message}`);
-    
-    // En cas d'échec, enregistrer l'erreur
+    console.error(`❌ error during synchronization: ${error.message}`);
+
+    // In case of failure, log the error
     const errorResult = {
       timestamp: new Date().toISOString(),
       release: CONFIG.releaseTag,
@@ -125,24 +125,24 @@ async function main() {
   }
 }
 
-// Fonction pour sauvegarder les résultats
+// function for saving the results
 async function saveResults(results, filename = CONFIG.logFile) {
   try {
-    // S'assurer que le dossier logs existe
+    // Assuming the logs directory exists
     const logsDir = path.join(__dirname, 'logs');
     await fs.mkdir(logsDir, { recursive: true });
-    
-    // Écrire le fichier de résultats
+
+    // Write the results file
     const filePath = path.join(logsDir, filename);
     await fs.writeFile(filePath, JSON.stringify(results, null, 2));
-    
-    console.log(`📝 Résultats sauvegardés dans ${filePath}`);
+
+    console.log(`📝 Results saved in ${filePath}`);
   } catch (error) {
-    console.error(`❌ Erreur lors de la sauvegarde des résultats: ${error.message}`);
+    console.error(`❌ Error during saving of the results: ${error.message}`);
   }
 }
 
-// Exécuter le script si appelé directement
+// execute the script if called directly
 if (require.main === module) {
   main().then(result => {
     if (result.success) {
@@ -153,14 +153,14 @@ if (require.main === module) {
   });
 }
 
-// Exporter pour une utilisation comme module
+// Export for use as a module
 module.exports = { 
   sync: main
 };
 
 /**
- * Comment utiliser ce script dans un pipeline CI/CD:
- * 
+ * How to use this script in a CI/CD pipeline:
+ *
  * 1. GitHub Actions:
  * ```yaml
  * jobs:
