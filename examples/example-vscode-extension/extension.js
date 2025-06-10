@@ -1,5 +1,5 @@
-const vscode = require('vscode');
-const issueSync = require('issuesync'); // Notre bibliothèque
+﻿const vscode = require('vscode');
+const issuesync = require('issuesync'); // Our library
 
 let initialized = false;
 
@@ -7,34 +7,34 @@ let initialized = false;
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-  console.log('Extension "GitHub Task Generator" est activée');
+  console.log('Extension "GitHub Task Generator" is activated');
 
-  // Initialiser IssueSync avec le token GitHub si disponible
-  initializeIssueSync();
+  // Initialize issuesync with GitHub token if available
+  initializeissuesync();
 
-  // Enregistrer la commande pour générer des tâches à partir d'issues GitHub
+  // Register command to generate tasks from GitHub issues
   let disposable = vscode.commands.registerCommand(
-    'github-task-generator.generateTasksFromIssues', 
-    generateTasksFromIssues
+    'github-task-generator.generateTasksFromissues', 
+    generateTasksFromissues
   );
 
   context.subscriptions.push(disposable);
 }
 
 /**
- * Initialise IssueSync avec le token GitHub depuis les paramètres
+ * Initialise issuesync with le token GitHub from the settings
  */
-function initializeIssueSync() {
+function initializeissuesync() {
   const config = vscode.workspace.getConfiguration('githubTaskGenerator');
   const token = config.get('token');
   
   if (token) {
     try {
-      issueSync.init({ token });
+      issuesync.init({ token });
       initialized = true;
       return true;
     } catch (error) {
-      vscode.window.showErrorMessage(`Erreur d'initialisation: ${error.message}`);
+      vscode.window.showErrorMessage(`Initialization error: ${error.message}`);
     }
   }
   
@@ -42,14 +42,14 @@ function initializeIssueSync() {
 }
 
 /**
- * Génère des tâches VS Code à partir d'issues GitHub
+ * Generate VS Code tasks from GitHub issues
  */
-async function generateTasksFromIssues() {
-  // Vérifier si IssueSync est initialisé
+async function generateTasksFromissues() {
+  // Check if issuesync is initialized
   if (!initialized) {
     const shouldConfigure = await vscode.window.showErrorMessage(
-      'GitHub token non configuré. Veuillez le configurer dans les paramètres.',
-      'Configurer maintenant'
+      'GitHub token not configured. Please configure it in the settings.',
+      'Configure now'
     );
     
     if (shouldConfigure) {
@@ -62,37 +62,37 @@ async function generateTasksFromIssues() {
   }
   
   try {
-    // Récupérer les paramètres de configuration
+    // Retrieve configuration settings
     const config = vscode.workspace.getConfiguration('githubTaskGenerator');
     const defaultOwner = config.get('defaultOwner');
     const defaultRepo = config.get('defaultRepo');
-    
-    // Demander les détails du dépôt
+
+    // Ask for details of the repository
     const owner = await vscode.window.showInputBox({
       value: defaultOwner,
-      placeHolder: 'Propriétaire du dépôt (ex: microsoft)',
-      prompt: 'Entrez le propriétaire du dépôt GitHub'
+      placeHolder: 'owner of the repository (ex: microsoft)',
+      prompt: 'Enter the owner of the GitHub repository'
     });
     
     if (!owner) return;
     
     const repo = await vscode.window.showInputBox({
       value: defaultRepo,
-      placeHolder: 'Nom du dépôt (ex: vscode)',
-      prompt: 'Entrez le nom du dépôt GitHub'
+      placeHolder: 'Name of the repository (ex: vscode)',
+      prompt: 'Enter the name of the GitHub repository'
     });
     
     if (!repo) return;
     
-    // Récupérer les issues depuis GitHub
+    // retrieveth issues from GitHub
     const issues = await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Notification,
-        title: `Récupération des issues de ${owner}/${repo}...`,
+        title: `Retrieval of issues from ${owner}/${repo}...`,
         cancellable: false
       },
       async () => {
-        return await issueSync.listIssues({ 
+        return await issuesync.listissues({ 
           owner, 
           repo,
           state: 'open' 
@@ -101,11 +101,11 @@ async function generateTasksFromIssues() {
     );
     
     if (!issues || issues.length === 0) {
-      vscode.window.showInformationMessage(`Aucune issue trouvée dans ${owner}/${repo}`);
+      vscode.window.showInformationMessage(`No issues found in ${owner}/${repo}`);
       return;
     }
-    
-    // Permettre à l'utilisateur de sélectionner une issue
+
+    // allow the user to select an issue
     const selection = await vscode.window.showQuickPick(
       issues.map(issue => ({
         label: issue.title,
@@ -113,53 +113,53 @@ async function generateTasksFromIssues() {
         detail: `Labels: ${issue.labels.map(l => l.name).join(', ')}`,
         issue
       })),
-      { placeHolder: 'Sélectionnez une issue pour générer une tâche' }
+      { placeHolder: 'Select an issue to generate a task' }
     );
     
     if (!selection) return;
     
     const issue = selection.issue;
-    
-    // Générer et ajouter la tâche
+
+    // generate and add the task
     await createTaskFromIssue(issue);
     
   } catch (error) {
-    vscode.window.showErrorMessage(`Erreur: ${error.message}`);
+    vscode.window.showErrorMessage(`Error: ${error.message}`);
   }
 }
 
 /**
- * Crée une tâche VS Code à partir d'une issue GitHub
+ * Create a VS Code task from a GitHub issue
  */
 async function createTaskFromIssue(issue) {
-  // Vérifier si un espace de travail est ouvert
+  // Check if a workspace is open
   if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
-    vscode.window.showErrorMessage('Aucun espace de travail ouvert');
+    vscode.window.showErrorMessage('No workspace open');
     return;
   }
   
   const workspaceFolder = vscode.workspace.workspaceFolders[0];
-  
-  // Demander le type de tâche à créer
+
+  // ask the type of task to create
   const taskType = await vscode.window.showQuickPick(
     [
-      { label: 'Shell', description: 'Commande shell', value: 'shell' },
-      { label: 'npm', description: 'Commande npm', value: 'npm' }
+      { label: 'Shell', description: 'command shell', value: 'shell' },
+      { label: 'npm', description: 'command npm', value: 'npm' }
     ],
-    { placeHolder: 'Sélectionnez le type de tâche' }
+    { placeHolder: 'Select the type of task' }
   );
   
   if (!taskType) return;
-  
-  // Demander la commande pour la tâche
+
+  // ask for command for the task
   const command = await vscode.window.showInputBox({
-    placeHolder: taskType.value === 'npm' ? 'test' : 'echo "Implémentation de #' + issue.number + '"',
-    prompt: `Entrez la commande ${taskType.value} pour cette tâche`
+    placeHolder: taskType.value === 'npm' ? 'test' : 'echo "Implementing #' + issue.number + '"',
+    prompt: `Enter the command ${taskType.value} for this task`
   });
   
   if (!command) return;
-  
-  // Créer l'objet de tâche
+
+  // create the task object
   const task = {
     label: `GitHub #${issue.number}: ${issue.title}`,
     type: taskType.value,
@@ -180,48 +180,48 @@ async function createTaskFromIssue(issue) {
       }
     }
   };
-  
-  // Ajouter la tâche au fichier tasks.json
+
+  // add the task to the tasks.json file
   await addTaskToWorkspace(task, workspaceFolder);
   
   vscode.window.showInformationMessage(
-    `Tâche créée pour l'issue #${issue.number}: ${issue.title}`
+    `Task created for the issue #${issue.number}: ${issue.title}`
   );
 }
 
 /**
- * Ajoute une tâche au fichier tasks.json de l'espace de travail
+ * Add a task to the tasks.json file of the workspace
  */
 async function addTaskToWorkspace(task, workspaceFolder) {
-  // Chemin vers le fichier tasks.json
+  // Path to the tasks.json file
   const tasksFilePath = vscode.Uri.joinPath(workspaceFolder.uri, '.vscode', 'tasks.json');
-  
-  // Lecture du fichier tasks.json s'il existe
+
+  // Read the file tasks.json if exist
   let tasksConfig;
   try {
     const fileContent = await vscode.workspace.fs.readFile(tasksFilePath);
     tasksConfig = JSON.parse(fileContent.toString());
   } catch {
-    // Le fichier n'existe pas ou n'est pas valide, créer un nouveau
+    // The file does not exist or is not valid, create a new one
     tasksConfig = {
       version: '2.0.0',
       tasks: []
     };
-    
-    // S'assurer que le dossier .vscode existe
+
+    // Ensure the .vscode directory exists
     try {
       await vscode.workspace.fs.createDirectory(
         vscode.Uri.joinPath(workspaceFolder.uri, '.vscode')
       );
     } catch (error) {
-      // Le dossier existe probablement déjà
+      // The directory probably already exists
     }
   }
   
-  // Ajouter la nouvelle tâche
+  // add the new task
   tasksConfig.tasks.push(task);
-  
-  // Écrire le fichier mis à jour
+
+  // Write the updated file
   await vscode.workspace.fs.writeFile(
     tasksFilePath,
     Buffer.from(JSON.stringify(tasksConfig, null, 2))
