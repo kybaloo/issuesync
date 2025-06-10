@@ -1,38 +1,38 @@
 <!--filepath: d:\Projects\Personal\IssueSync\docs\integration-with-copilot-extension.md -->
-# Intégration d'IssueSync dans une extension VS Code utilisant Copilot
+# IssueSync Integration in a VS Code Extension Using Copilot
 
-Ce guide explique comment intégrer la bibliothèque IssueSync dans une extension VS Code qui utilise Copilot pour générer des tâches. L'objectif est de permettre aux utilisateurs de créer des tâches à partir d'issues GitHub en utilisant à la fois IssueSync pour récupérer les données des issues et Copilot pour les transformer en tâches intelligentes.
+This guide explains how to integrate the IssueSync library into a VS Code extension that uses Copilot to generate tasks. The goal is to allow users to create tasks from GitHub issues using both IssueSync to retrieve issue data and Copilot to transform them into intelligent tasks.
 
-## Prérequis
+## Prerequisites
 
-- Une extension VS Code existante qui génère des tâches avec Copilot
-- Node.js et npm installés
+- An existing VS Code extension that generates tasks with Copilot
+- Node.js and npm installed
 
-## Étapes d'intégration
+## Integration Steps
 
-### 1. Installer IssueSync
+### 1. Install IssueSync
 
-Ajoutez IssueSync comme dépendance à votre extension VS Code :
+Add IssueSync as a dependency to your VS Code extension:
 
 ```bash
 npm install --save issuesync
 ```
 
-### 2. Configurer l'authentification GitHub
+### 2. Configure GitHub Authentication
 
-Ajoutez une configuration pour stocker le token GitHub :
+Add a configuration to store the GitHub token:
 
 ```javascript
-// Dans le fichier package.json de votre extension
+// In your extension's package.json file
 {
   "contributes": {
     "configuration": {
-      "title": "Votre Extension",
+      "title": "Your Extension",
       "properties": {
-        "votreExtension.githubToken": {
+        "yourExtension.githubToken": {
           "type": "string",
           "default": "",
-          "description": "Token GitHub pour accéder aux issues (scope: repo)"
+          "description": "GitHub token to access issues (scope: repo)"
         }
       }
     }
@@ -40,51 +40,51 @@ Ajoutez une configuration pour stocker le token GitHub :
 }
 ```
 
-### 3. Initialiser IssueSync
+### 3. Initialize IssueSync
 
-Ajoutez le code suivant dans votre extension pour initialiser IssueSync :
+Add the following code in your extension to initialize IssueSync:
 
 ```javascript
 const issueSync = require('issuesync');
 
-// Dans votre fonction d'activation
+// In your activation function
 function activate(context) {
-  // Récupérer le token GitHub depuis les paramètres
-  const config = vscode.workspace.getConfiguration('votreExtension');
+  // Get the GitHub token from settings
+  const config = vscode.workspace.getConfiguration('yourExtension');
   const githubToken = config.get('githubToken');
   
-  // Initialiser IssueSync si le token est disponible
+  // Initialize IssueSync if token is available
   if (githubToken) {
     issueSync.init({ token: githubToken });
   }
   
-  // ... le reste de votre code d'activation
+  // ... rest of your activation code
 }
 ```
 
-### 4. Ajouter une commande pour récupérer les issues
+### 4. Add a Command to Retrieve Issues
 
 ```javascript
-// Enregistrer une commande pour récupérer les issues
-const fetchIssuesCommand = vscode.commands.registerCommand('votreExtension.fetchIssues', async () => {
+// Register a command to retrieve issues
+const fetchIssuesCommand = vscode.commands.registerCommand('yourExtension.fetchIssues', async () => {
   try {
-    // Vérifier si le token est configuré
-    const config = vscode.workspace.getConfiguration('votreExtension');
+    // Check if token is configured
+    const config = vscode.workspace.getConfiguration('yourExtension');
     const githubToken = config.get('githubToken');
     
     if (!githubToken) {
-      vscode.window.showErrorMessage('Token GitHub non configuré');
+      vscode.window.showErrorMessage('GitHub token not configured');
       return;
     }
     
-    // Demander les détails du dépôt
-    const owner = await vscode.window.showInputBox({ prompt: 'Propriétaire du dépôt GitHub' });
+    // Ask for repository details
+    const owner = await vscode.window.showInputBox({ prompt: 'GitHub repository owner' });
     if (!owner) return;
     
-    const repo = await vscode.window.showInputBox({ prompt: 'Nom du dépôt GitHub' });
+    const repo = await vscode.window.showInputBox({ prompt: 'GitHub repository name' });
     if (!repo) return;
     
-    // Récupérer les issues avec IssueSync
+    // Retrieve issues with IssueSync
     const issues = await issueSync.listIssues({
       owner,
       repo,
@@ -92,44 +92,43 @@ const fetchIssuesCommand = vscode.commands.registerCommand('votreExtension.fetch
     });
     
     if (issues.length === 0) {
-      vscode.window.showInformationMessage('Aucune issue trouvée');
+      vscode.window.showInformationMessage('No issues found');
       return;
     }
     
-    // Permettre à l'utilisateur de sélectionner des issues
+    // Allow user to select issues
     const selectedIssue = await vscode.window.showQuickPick(
-      issues.map(issue => ({
-        label: issue.title,
+      issues.map(issue => ({        label: issue.title,
         description: `#${issue.number}`,
         issue: issue
       })),
-      { placeHolder: 'Sélectionnez une issue' }
+      { placeHolder: 'Select an issue' }
     );
     
     if (!selectedIssue) return;
     
-    // Générer une tâche avec Copilot
+    // Generate a task with Copilot
     await generateTaskWithCopilot(selectedIssue.issue);
     
   } catch (error) {
-    vscode.window.showErrorMessage(`Erreur: ${error.message}`);
+    vscode.window.showErrorMessage(`Error: ${error.message}`);
   }
 });
 
 context.subscriptions.push(fetchIssuesCommand);
 ```
 
-### 5. Intégrer avec l'API Copilot
+### 5. Integrate with Copilot API
 
-Voici comment vous pourriez intégrer les issues récupérées avec l'API Copilot pour générer des tâches :
+Here's how you could integrate the retrieved issues with the Copilot API to generate tasks:
 
 ```javascript
 /**
- * Génère une tâche à partir d'une issue GitHub en utilisant Copilot
- * @param {Object} issue - Issue GitHub récupérée via IssueSync
+ * Generates a task from a GitHub issue using Copilot
+ * @param {Object} issue - GitHub issue retrieved via IssueSync
  */
 async function generateTaskWithCopilot(issue) {
-  // Formatez l'issue pour Copilot
+  // Format the issue for Copilot
   const issueData = {
     title: issue.title,
     body: issue.body,
@@ -138,75 +137,74 @@ async function generateTaskWithCopilot(issue) {
     url: issue.html_url
   };
   
-  // Supposons que votre extension expose déjà une API pour générer des tâches avec Copilot
+  // Assume your extension already exposes an API to generate tasks with Copilot
   const taskDescription = `
-    Titre: ${issueData.title}
-    Description: ${issueData.body || 'Aucune description'}
+    Title: ${issueData.title}
+    Description: ${issueData.body || 'No description'}
     Labels: ${issueData.labels.join(', ')}
     URL: ${issueData.url}
   `;
   
-  // Appel à votre API existante qui utilise Copilot
-  // Ceci est un exemple - remplacez-le par votre propre API
-  const generatedTask = await votreCopilotAPI.generateTaskFromDescription(taskDescription);
+  // Call to your existing API that uses Copilot
+  // This is an example - replace with your own API
+  const generatedTask = await yourCopilotAPI.generateTaskFromDescription(taskDescription);
   
-  // Créer le fichier tasks.json avec la tâche générée
+  // Create the tasks.json file with the generated task
   await createTaskFile(generatedTask, issue);
   
-  vscode.window.showInformationMessage(`Tâche créée pour l'issue #${issue.number}`);
+  vscode.window.showInformationMessage(`Task created for issue #${issue.number}`);
 }
 ```
 
-### 6. Créer le fichier tasks.json
+### 6. Create the tasks.json File
 
 ```javascript
 /**
- * Crée ou met à jour le fichier tasks.json avec la nouvelle tâche
- * @param {Object} generatedTask - Tâche générée par Copilot
- * @param {Object} issue - Issue GitHub d'origine
+ * Creates or updates the tasks.json file with the new task
+ * @param {Object} generatedTask - Task generated by Copilot
+ * @param {Object} issue - Original GitHub issue
  */
 async function createTaskFile(generatedTask, issue) {
-  // Vérifier si un espace de travail est ouvert
+  // Check if a workspace is open
   if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
-    throw new Error('Aucun espace de travail ouvert');
+    throw new Error('No workspace open');
   }
   
   const workspaceFolder = vscode.workspace.workspaceFolders[0];
   const tasksJsonPath = vscode.Uri.joinPath(workspaceFolder.uri, '.vscode', 'tasks.json');
   
-  // Lire le fichier tasks.json existant ou créer un modèle
+  // Read existing tasks.json file or create a template
   let tasksConfig;
   try {
     const content = await vscode.workspace.fs.readFile(tasksJsonPath);
     tasksConfig = JSON.parse(content.toString());
   } catch {
-    // Le fichier n'existe pas, créer un modèle
+    // File doesn't exist, create a template
     tasksConfig = {
       version: '2.0.0',
       tasks: []
     };
     
-    // S'assurer que le dossier .vscode existe
+    // Ensure .vscode folder exists
     await vscode.workspace.fs.createDirectory(
       vscode.Uri.joinPath(workspaceFolder.uri, '.vscode')
     );
   }
   
-  // Ajouter la nouvelle tâche avec des métadonnées de l'issue
+  // Add the new task with issue metadata
   const task = {
     ...generatedTask,
     metadata: {
       githubIssue: {
         number: issue.number,
-        title: issue.title,
-        url: issue.html_url
+        title: issue.title,        url: issue.html_url
       }
     }
   };
   
   tasksConfig.tasks.push(task);
   
-  // Écrire le fichier mis à jour
+  // Write the updated file
   await vscode.workspace.fs.writeFile(
     tasksJsonPath,
     Buffer.from(JSON.stringify(tasksConfig, null, 2))
@@ -214,22 +212,22 @@ async function createTaskFile(generatedTask, issue) {
 }
 ```
 
-## Exemple complet
+## Complete Example
 
-Pour un exemple complet d'intégration, consultez [le code source d'exemple](../examples/vscode-copilot-tasks-extension.js) fourni avec IssueSync.
+For a complete integration example, see [the example source code](../examples/vscode-copilot-tasks-extension.js) provided with IssueSync.
 
-## Avantages de cette intégration
+## Benefits of This Integration
 
-1. **Données réelles** : Utilise des issues GitHub réelles comme base pour les tâches
-2. **Métadonnées préservées** : Conserve les liens vers les issues d'origine
-3. **Interaction transparente** : L'utilisateur n'a pas besoin de quitter VS Code
-4. **Génération intelligente** : Copilot peut analyser le contenu des issues pour créer des tâches adaptées
-5. **Solution complète** : Combine les forces d'IssueSync et de Copilot en une seule expérience
+1. **Real Data**: Uses real GitHub issues as the basis for tasks
+2. **Preserved Metadata**: Maintains links to original issues
+3. **Seamless Interaction**: User doesn't need to leave VS Code
+4. **Intelligent Generation**: Copilot can analyze issue content to create tailored tasks
+5. **Complete Solution**: Combines the strengths of IssueSync and Copilot in a single experience
 
-## Conseils d'implémentation
+## Implementation Tips
 
-- Gérez correctement les erreurs d'authentification et d'API
-- Ajoutez une option pour rafraîchir les issues sans redémarrer l'extension
-- Permettez aux utilisateurs de synchroniser plusieurs issues en une seule opération
-- Ajoutez une option pour mettre à jour les tâches lorsque les issues sont mises à jour sur GitHub
-- Considérez l'utilisation des fonctionnalités de filtrage d'IssueSync pour cibler certaines issues
+- Properly handle authentication and API errors
+- Add an option to refresh issues without restarting the extension
+- Allow users to synchronize multiple issues in a single operation
+- Add an option to update tasks when issues are updated on GitHub
+- Consider using IssueSync's filtering features to target specific issues
