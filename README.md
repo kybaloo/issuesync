@@ -75,7 +75,6 @@ const result = await issueSync.syncIssues({
 
 console.log(`Created: ${result.created.length}, Skipped: ${result.skipped.length}`);
 ```
-```
 
 ## Integration Examples
 
